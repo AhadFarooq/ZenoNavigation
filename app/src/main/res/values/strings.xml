@@ -1,0 +1,8 @@
+<resources>
+    <string name="tfe_od_app_name" translation_description="Zeno Navigation System [CHAR_LIMIT=40]">Zeno Navigation</string>
+    <string name="tfe_od_camera_error" translation_description="Error regarding camera support[CHAR_LIMIT=40]">This device doesn\'t support Camera2 API.</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBo6CVkO8YOfq3eqRgaLSrQ5PEARPKBtyA</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
