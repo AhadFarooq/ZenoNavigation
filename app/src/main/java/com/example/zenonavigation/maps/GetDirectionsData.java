@@ -3,14 +3,8 @@ package com.example.zenonavigation.maps;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 
-import com.example.zenonavigation.R;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.ButtCap;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
@@ -29,7 +23,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.spec.ECField;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,22 +39,11 @@ public class GetDirectionsData extends AsyncTask<Object, String ,String> {
     static String[] polylines;
     static String[] instructions;
     static String[] maneuver;
+    static LatLng[] start_location;
+    static Double[] start_lat;
+    static Double[] start_lng;
 
     static int stepcount;
-    static int count;
-
-    static ImageView imageView;
-
-    public GetDirectionsData (final ImageView imageView) {
-        this.imageView = imageView;
-        imageView.setImageResource(android.R.color.transparent);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getDirections();
-            }
-        });
-    }
 
     public GetDirectionsData(Context c)
     {
@@ -109,12 +91,22 @@ public class GetDirectionsData extends AsyncTask<Object, String ,String> {
             stepcount = steps.length();
 
             polylines = new String[stepcount];
+            start_lat = new Double[stepcount];
+            start_lng = new Double[stepcount];
+            start_location = new LatLng[stepcount];
             instructions = new String[stepcount];
             maneuver = new String[stepcount];
 
             for (int i=0; i<stepcount; i++) {
 
                 polylines[i] = steps.getJSONObject(i).getJSONObject("polyline").getString("points");
+
+
+                start_lat[i] = steps.getJSONObject(i).getJSONObject("start_location").getDouble("lat");
+                start_lng[i] = steps.getJSONObject(i).getJSONObject("start_location").getDouble("lng");
+
+                start_location[i] = new LatLng(start_lat[i], start_lng[i]);
+
 
                 if (steps.getJSONObject(i).has("html_instructions")) {
                     instructions[i] = steps.getJSONObject(i).getString("html_instructions");
@@ -124,10 +116,19 @@ public class GetDirectionsData extends AsyncTask<Object, String ,String> {
                     maneuver[i] = steps.getJSONObject(i).getString("maneuver");
                 }
 
-                Log.d("owman", i+", "+instructions[i]);
-                Log.d("owman", i+", "+maneuver[i]);
-
             }
+
+
+
+            //Send to Directions Class
+            //------------------------
+
+            Directions.setStartLocation(start_location);
+            Directions.setManeuver(maneuver);
+            Directions.setInstructions(instructions);
+
+            //------------------------
+
 
 
             int polylinecount = polylines.length;
@@ -146,56 +147,10 @@ public class GetDirectionsData extends AsyncTask<Object, String ,String> {
                 mMap.addPolyline(polylineOptions);
             }
 
-            count = 1;
-            getDirections();
-
         }
         catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    public void getDirections() {
-
-        try{
-            if (count<stepcount) {
-
-                if (maneuver[count].equals("turn-slight-left")) {
-                    imageView.setImageResource(R.drawable.slight_left);
-                }
-                else if (maneuver[count].equals("uturn-left")) {
-                    imageView.setImageResource(R.drawable.uturn_left);
-                }
-                else if (maneuver[count].equals("turn-left")) {
-                    imageView.setImageResource(R.drawable.left);
-                }
-                else if (maneuver[count].equals("turn-slight-right")) {
-                    imageView.setImageResource(R.drawable.slight_right);
-                }
-                else if (maneuver[count].equals("uturn-right")) {
-                    imageView.setImageResource(R.drawable.uturn_right);
-                }
-                else if (maneuver[count].equals("turn-right")) {
-                    imageView.setImageResource(R.drawable.right);
-                }
-                else if (maneuver[count].equals("straight")) {
-                    imageView.setImageResource(R.drawable.straight);
-                }
-                else if (maneuver[count].equals("null")) {
-                    imageView.setImageResource(android.R.color.transparent);
-                }
-            }
-            else{
-                mMap.clear();
-                imageView.setImageResource(android.R.color.transparent);
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        count++;
-
     }
 
 }

@@ -2,11 +2,9 @@ package com.example.zenonavigation.maps;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.zenonavigation.MainActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -27,7 +25,6 @@ import java.net.URL;
 
 public class GetPlaceData extends AsyncTask<Object, String ,String> {
 
-    private static final String TAG = "myPlace";
     GoogleMap mMap;
     String url;
     FloatingActionButton fab2;
@@ -88,8 +85,6 @@ public class GetPlaceData extends AsyncTask<Object, String ,String> {
 
             JSONArray results = jsonObject.getJSONArray("results");
 
-            Log.d(TAG, "place count: "+results.length());
-
             if (results.length()>0)
             {
                 lat = jsonObject.getJSONArray("results").getJSONObject(0)
@@ -107,8 +102,6 @@ public class GetPlaceData extends AsyncTask<Object, String ,String> {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 17));
 
                 fab2.setVisibility(View.VISIBLE);
-
-                //Log.d(TAG, "GetPlaceData: "+location);
 
             }
             else

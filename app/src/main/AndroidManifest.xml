@@ -22,14 +22,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".Main2Activity">
-        </activity>
-
         <activity
             android:name=".SplashScreen"
             android:label="@string/tfe_od_app_name"
-            android:theme="@style/SplashScreen"
-            android:screenOrientation="portrait">
+            android:theme="@style/SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -37,6 +33,10 @@
         </activity>
 
         <activity android:name=".MainActivity"
+            android:theme="@style/AppTheme">
+        </activity>
+
+        <activity android:name=".Main2Activity"
             android:theme="@style/AppTheme">
         </activity>
 

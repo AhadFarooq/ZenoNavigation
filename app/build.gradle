@@ -68,8 +68,3 @@ dependencies {
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }
-
-sceneform.asset('sampledata/arrow.obj', // 'Source Asset Path' specified during import.
-        'default',                    // 'Material Path' specified during import.
-        'sampledata/arrow.sfa', // '.sfa Output Path' specified during import.
-        'src/main/res/raw/arrow')      // '.sfb Output Path' specified during import.
