@@ -37,6 +37,7 @@ import android.util.Size;
 import android.util.TypedValue;
 import android.view.Surface;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -82,6 +83,9 @@ public class Main2Activity extends AppCompatActivity implements
 
   private static Fragment fragment;
 
+  private FrameLayout nightVision;
+
+  private boolean nightVisionOn = false;
   private boolean gps_enabled = false;
   private boolean network_enabled = false;
 
@@ -155,6 +159,7 @@ public class Main2Activity extends AppCompatActivity implements
   private ImageButton buttonMyLocation;
 
   private ImageButton buttonDetect;
+  private ImageButton buttonNightVision;
 
 
 
@@ -178,6 +183,9 @@ public class Main2Activity extends AppCompatActivity implements
 
 
 
+
+
+    nightVision = findViewById(R.id.nightVision);
 
 
 
@@ -287,6 +295,27 @@ public class Main2Activity extends AppCompatActivity implements
       @Override
       public void onClick(View v) {
         finish();
+      }
+    });
+
+
+
+
+
+    buttonNightVision = findViewById(R.id.buttonNightVision);
+    buttonNightVision.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if (!nightVisionOn)
+        {
+          nightVision.setBackgroundColor(getResources().getColor(R.color.nightVision_transparent, null));
+          nightVisionOn = true;
+        }
+        else
+        {
+          nightVision.setBackgroundColor(getResources().getColor(R.color.full_transparent, null));
+          nightVisionOn = false;
+        }
       }
     });
 

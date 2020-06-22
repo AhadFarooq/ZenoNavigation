@@ -54,6 +54,7 @@ import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
+import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.maps.android.SphericalUtil;
 
 import java.text.DecimalFormat;
@@ -68,9 +69,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private boolean network_enabled = false;
     private static boolean navigating = false;
     private boolean expanded = false;
+    private boolean nightVisionOn = false;
 
     private FrameLayout arLayout;
     private ArFragment arFragment;
+
+    private FrameLayout nightVision;
 
     private static GoogleMap mMap;
     private static LatLng origin;
@@ -84,8 +88,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private SearchView searchView;
 
     private ImageButton buttonDetect;
+    private ImageButton buttonNightVision;
 
     private TextView textSpeed;
+    private TextView textUnit;
     private TextView textInstructions;
 
 
@@ -130,6 +136,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
          *
          *
          AR */
+
+        nightVision = findViewById(R.id.nightVision);
 
         arLayout = findViewById(R.id.arLayout);
 
@@ -195,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
+
         arFragment.getArSceneView().getScene().addOnUpdateListener(new Scene.OnUpdateListener() {
             @Override
             public void onUpdate(FrameTime frameTime) {
@@ -207,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 Frame frame = arFragment.getArSceneView().getArFrame();
                 Camera camera = frame.getCamera();
-                cameraPose = camera.getDisplayOrientedPose().compose(Pose.makeTranslation(0, 0, -5f));
+                cameraPose = camera.getDisplayOrientedPose().compose(Pose.makeTranslation(0, -1, -5f));
 
                 try
                 {
@@ -278,7 +287,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         {
 
                             float speed = location.getSpeed();
-                            textSpeed.setText(df2.format(speed)+"\nm/s");
+                            textSpeed.setText(df2.format(speed));
+                            textUnit.setText("m/s");
 
 
                             CameraPosition oldPos = mMap.getCameraPosition();
@@ -443,6 +453,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         textSpeed = findViewById(R.id.textSpeed);
+        textUnit = findViewById(R.id.textUnit);
         textInstructions = findViewById(R.id.textInstructions);
 
 
@@ -531,7 +542,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 {
                     requestLocationPermission();
                 }
-                getDeviceLocation();
+                    getDeviceLocation();
             }
         });
 
@@ -547,6 +558,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 {
                     Intent intent = new Intent(MainActivity.this, Main2Activity.class);
                     startActivity(intent);
+                }
+            }
+        });
+
+
+
+
+
+        buttonNightVision = findViewById(R.id.buttonNightVision);
+        buttonNightVision.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!nightVisionOn)
+                {
+                    nightVision.setBackgroundColor(getResources().getColor(R.color.nightVision_transparent, null));
+                    nightVisionOn = true;
+                }
+                else
+                {
+                    nightVision.setBackgroundColor(getResources().getColor(R.color.full_transparent, null));
+                    nightVisionOn = false;
                 }
             }
         });
@@ -619,6 +651,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onResume() {
         super.onResume();
+
 
         final View decorView = getWindow().getDecorView();
         decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {
@@ -778,15 +811,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
-
     }
-
-
-
-
-
-
-
 
     private void updateLocationUI() {
         if (mMap == null) {
@@ -951,15 +976,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fab2.setVisibility(View.INVISIBLE);
         textInstructions.setText("");
         textSpeed.setText("");
+        textUnit.setText("");
         mMap.clear();
         destination = null;
         getDeviceLocation();
         removeRenderable();
-
-    }
-
-    public void startNavigation()
-    {
 
     }
 

@@ -19,76 +19,126 @@
             android:layout_weight="3"
             android:visibility="visible">
 
-            <fragment android:name="com.google.ar.sceneform.ux.ArFragment"
+            <fragment
                 android:id="@+id/ux_fragment"
+                android:name="com.google.ar.sceneform.ux.ArFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <Button
-                android:id="@+id/buttonRender"
+            <FrameLayout
+                android:id="@+id/nightVision"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:text="Render"
-                android:visibility="invisible" />
-
-            <TextView
-                android:id="@+id/textSpeed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:padding="10dp"
-                android:shadowColor = "#000"
-                android:shadowDx = "2"
-                android:shadowDy = "-2"
-                android:shadowRadius = "2"
-                android:layout_gravity="start|top"
-                android:textStyle="bold"
-                android:textColor="#ffffff"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textInstructions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:padding="10dp"
-                android:shadowColor = "#000"
-                android:shadowDx = "2"
-                android:shadowDy = "-2"
-                android:shadowRadius = "2"
-                android:layout_gravity="center|bottom"
-                android:textAlignment="center"
-                android:textColor="#ffffff"
-                android:textSize="22sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="10dp"
-                android:layout_gravity="end|top">
-
-                <ImageButton
-                    android:id="@+id/buttonDetect"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="4"
-                    android:layout_gravity="center"
-                    android:background="#0000"
-                    app:srcCompat="@drawable/twotone_satellite_white_36" />
+                android:layout_height="match_parent"
+                android:background="@color/full_transparent">
 
                 <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:layout_gravity="center"
-                    android:text="Detection"
+                    android:id="@+id/textInstructions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|bottom"
+                    android:padding="10dp"
+                    android:shadowColor="#000"
+                    android:shadowDx="2"
+                    android:shadowDy="-2"
+                    android:shadowRadius="2"
+                    android:text=""
+                    android:textAlignment="center"
                     android:textColor="#ffffff"
-                    android:textSize="10sp" />
+                    android:textSize="24sp" />
 
-            </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|top"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textSpeed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="5"
+                        android:shadowColor="#000"
+                        android:shadowDx="2"
+                        android:shadowDy="-2"
+                        android:shadowRadius="2"
+                        android:text=""
+                        android:textColor="#ffffff"
+                        android:textSize="36sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textUnit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="2"
+                        android:shadowColor="#000"
+                        android:shadowDx="2"
+                        android:shadowDy="-2"
+                        android:shadowRadius="2"
+                        android:text=""
+                        android:textColor="#ffffff"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|top"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <ImageButton
+                        android:id="@+id/buttonDetect"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="4"
+                        android:background="#00000000"
+                        app:srcCompat="@drawable/twotone_satellite_white_36" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="2"
+                        android:text="Detection"
+                        android:textColor="#ffffff"
+                        android:textSize="10sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|top"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <ImageButton
+                        android:id="@+id/buttonNightVision"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="4"
+                        android:background="#00000000"
+                        app:srcCompat="@drawable/twotone_brightness_4_white_36" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="2"
+                        android:text="Night Vision"
+                        android:textColor="#ffffff"
+                        android:textSize="10sp" />
+
+                </LinearLayout>
+
+            </FrameLayout>
 
         </FrameLayout>
 

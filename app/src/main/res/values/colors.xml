@@ -6,4 +6,6 @@
     <color name="colorWhite">#ffffff</color>
     <color name="colorBlack">#000000</color>
     <color name="tfe_semi_transparent">#66000000</color>
+    <color name="full_transparent">#00000000</color>
+    <color name="nightVision_transparent">#6666BF2F</color>
 </resources>
