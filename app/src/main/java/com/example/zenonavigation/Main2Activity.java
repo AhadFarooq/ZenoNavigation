@@ -39,6 +39,7 @@ import android.view.Surface;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -160,6 +161,7 @@ public class Main2Activity extends AppCompatActivity implements
 
   private ImageButton buttonDetect;
   private ImageButton buttonNightVision;
+  private TextView textNightVision;
 
 
 
@@ -275,6 +277,10 @@ public class Main2Activity extends AppCompatActivity implements
      Controls */
 
 
+    textNightVision = findViewById(R.id.textNightVision);
+
+
+
 
     buttonMyLocation = findViewById(R.id.buttonMyLocation);
     buttonMyLocation.setOnClickListener(new View.OnClickListener() {
@@ -309,11 +315,13 @@ public class Main2Activity extends AppCompatActivity implements
         if (!nightVisionOn)
         {
           nightVision.setBackgroundColor(getResources().getColor(R.color.nightVision_transparent, null));
+          textNightVision.setTextColor(getResources().getColor(R.color.colorAccent, null));
           nightVisionOn = true;
         }
         else
         {
           nightVision.setBackgroundColor(getResources().getColor(R.color.full_transparent, null));
+          textNightVision.setTextColor(getResources().getColor(R.color.colorWhite, null));
           nightVisionOn = false;
         }
       }

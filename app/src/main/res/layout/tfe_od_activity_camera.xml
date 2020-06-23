@@ -47,26 +47,30 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end|top"
                 android:orientation="vertical"
-                android:padding="10dp"
-                android:layout_gravity="end|top">
+                android:padding="10dp">
 
                 <ImageButton
                     android:id="@+id/buttonDetect"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_weight="4"
                     android:layout_gravity="center"
+                    android:layout_weight="2"
                     android:background="#00000000"
-                    app:srcCompat="@drawable/twotone_directions_white_36" />
+                    app:srcCompat="@drawable/twotone_satellite_white_36" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:layout_weight="2"
                     android:layout_gravity="center"
-                    android:text="Directions"
-                    android:textColor="#ffffff"
+                    android:layout_weight="1"
+                    android:shadowColor="#000"
+                    android:shadowDx="2"
+                    android:shadowDy="-2"
+                    android:shadowRadius="2"
+                    android:text="Detection : ON"
+                    android:textColor="@color/colorAccent"
                     android:textSize="10sp" />
 
             </LinearLayout>
@@ -83,15 +87,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_gravity="center"
-                    android:layout_weight="4"
+                    android:layout_weight="2"
                     android:background="#00000000"
                     app:srcCompat="@drawable/twotone_brightness_4_white_36" />
 
                 <TextView
+                    android:id="@+id/textNightVision"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_gravity="center"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
+                    android:shadowColor="#000"
+                    android:shadowDx="2"
+                    android:shadowDy="-2"
+                    android:shadowRadius="2"
                     android:text="Night Vision"
                     android:textColor="#ffffff"
                     android:textSize="10sp" />

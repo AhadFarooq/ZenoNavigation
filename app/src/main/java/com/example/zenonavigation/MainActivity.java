@@ -1,7 +1,9 @@
 package com.example.zenonavigation;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
 import android.text.Html;
+import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -89,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private ImageButton buttonDetect;
     private ImageButton buttonNightVision;
+    private TextView textNightVision;
 
     private TextView textSpeed;
     private TextView textUnit;
@@ -208,12 +212,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onUpdate(FrameTime frameTime) {
 
-                hasLocationPermission();
-                if (!mLocationPermissionGranted)
-                {
-                    requestLocationPermission();
-                }
-
                 Frame frame = arFragment.getArSceneView().getArFrame();
                 Camera camera = frame.getCamera();
                 cameraPose = camera.getDisplayOrientedPose().compose(Pose.makeTranslation(0, -1, -5f));
@@ -240,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+
 
 
 
@@ -429,22 +428,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         /**
          *
          *
@@ -455,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         textSpeed = findViewById(R.id.textSpeed);
         textUnit = findViewById(R.id.textUnit);
         textInstructions = findViewById(R.id.textInstructions);
+        textNightVision = findViewById(R.id.textNightVision);
 
 
         fab = findViewById(R.id.fab);
@@ -537,12 +521,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 checkGpsPermission();
                 getGpsPermission();
-                hasLocationPermission();
-                if (!mLocationPermissionGranted)
-                {
-                    requestLocationPermission();
-                }
-                    getDeviceLocation();
+                enableMyLocation();
             }
         });
 
@@ -573,11 +552,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (!nightVisionOn)
                 {
                     nightVision.setBackgroundColor(getResources().getColor(R.color.nightVision_transparent, null));
+                    textNightVision.setTextColor(getResources().getColor(R.color.colorAccent, null));
                     nightVisionOn = true;
                 }
                 else
                 {
                     nightVision.setBackgroundColor(getResources().getColor(R.color.full_transparent, null));
+                    textNightVision.setTextColor(getResources().getColor(R.color.colorWhite, null));
                     nightVisionOn = false;
                 }
             }
@@ -642,11 +623,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
-
-
-
-
     }
+
+
+
+
+
 
     @Override
     public void onResume() {
@@ -674,15 +656,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         arFragment.getPlaneDiscoveryController().setInstructionView(null);
         arFragment.getArSceneView().getPlaneRenderer().setEnabled(false);
 
-        hasLocationPermission();
-
     }
-
-
-
-
-
-
 
 
 
@@ -733,10 +707,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
-
-
-
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -745,7 +715,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.getUiSettings().setCompassEnabled(false);
 
         checkGpsPermission();
-        updateLocationUI();
+        enableMyLocation();
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener(){
             @Override
@@ -779,56 +749,50 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
-    private boolean hasLocationPermission() {
-        return mLocationPermissionGranted = (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat
-                .checkSelfPermission(this.getApplicationContext(),
-                        Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED);
-    }
 
-    private void requestLocationPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+
+    private void enableMyLocation() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            if (mMap != null) {
+                mLocationPermissionGranted = true;
+                mMap.setMyLocationEnabled(true);
+                mMap.setTrafficEnabled(true);
+                getDeviceLocation();
+            }
+        } else {
+            mLocationPermissionGranted = false;
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        mLocationPermissionGranted = false;
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationPermissionGranted = true;
-                    updateLocationUI();
-                }
-                else {
-                    requestLocationPermission();
-                }
-            }
-        }
-    }
 
-    private void updateLocationUI() {
-        if (mMap == null) {
+        if (requestCode != PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
             return;
         }
-        try {
-            if (mLocationPermissionGranted) {
-                mMap.setMyLocationEnabled(true);
-                getDeviceLocation();
-                mMap.setTrafficEnabled(true);
 
-            } else {
-                mMap.setMyLocationEnabled(false);
-            }
-        } catch (SecurityException e)  {
-            Log.e("Exception: %s", e.getMessage());
+        if (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = true;
+            enableMyLocation();
+
+            Intent intent = new Intent(this, MainActivity.class);
+            this.startActivity(intent);
+            this.finishAffinity();
+
         }
+        else {
+            mLocationPermissionGranted = false;
+            enableMyLocation();
+        }
+
     }
 
     public void getDeviceLocation() {
