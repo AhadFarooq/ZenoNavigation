@@ -101,7 +101,7 @@
                     android:shadowDx="2"
                     android:shadowDy="-2"
                     android:shadowRadius="2"
-                    android:text="Night Vision"
+                    android:text=" Night Vision "
                     android:textColor="#ffffff"
                     android:textSize="10sp" />
 
@@ -122,14 +122,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <ImageButton
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/buttonMyLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|top"
-                android:background="#0000"
-                android:padding="10dp"
-                app:srcCompat="@drawable/round_my_location_black_24" />
+                android:layout_margin="10dp"
+                app:fabSize="mini"
+                app:backgroundTint="@color/colorWhite"
+                android:src="@drawable/round_my_location_black_36"
+                android:visibility="visible" />
 
         </FrameLayout>
 

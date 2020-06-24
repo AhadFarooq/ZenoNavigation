@@ -8,11 +8,11 @@ public class Place {
 
     public Place(){}
 
-    public void setPlace(LatLng place) {
+    public static void setPlace(LatLng place) {
         Place.place = place;
     }
 
-    public LatLng getPlace() {
+    public static LatLng getPlace() {
         return place;
     }
 

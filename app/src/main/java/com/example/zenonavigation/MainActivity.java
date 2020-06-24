@@ -1,20 +1,19 @@
 package com.example.zenonavigation;
 
 import android.Manifest;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
 import android.text.Html;
-import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -57,15 +56,17 @@ import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.maps.android.SphericalUtil;
 
 import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 
     private static DecimalFormat df2 = new DecimalFormat("#.##");
+    private static DecimalFormat df6 = new DecimalFormat("#.######");
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1000;
     private static boolean mLocationPermissionGranted;
     private boolean gps_enabled = false;
@@ -73,9 +74,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static boolean navigating = false;
     private boolean expanded = false;
     private boolean nightVisionOn = false;
+    private boolean hybridMap = false;
 
     private FrameLayout arLayout;
     private ArFragment arFragment;
+
+    private FrameLayout popupLayout;
 
     private FrameLayout nightVision;
 
@@ -84,10 +88,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static LatLng destination;
     private Marker marker;
 
-    private ImageButton buttonMyLocation;
+    private static String travelMode = "driving";
+
+    private FloatingActionButton buttonMyLocation;
+    private FloatingActionButton buttonMapLayer;
     private ImageButton buttonExpand;
     private FloatingActionButton fab;
     private FloatingActionButton fab2;
+    private FloatingActionButton fabCancel;
+    private FloatingActionButton fabTravelMode;
     private SearchView searchView;
 
     private ImageButton buttonDetect;
@@ -97,6 +106,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView textSpeed;
     private TextView textUnit;
     private TextView textInstructions;
+
+    private TextView textCoordinates;
+    private TextView textAddress;
 
 
     private Session session;
@@ -133,6 +145,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
+        /**
+         *
+         *
+         *
+         Layouts */
+
+
+        arLayout = findViewById(R.id.arLayout);
+
+        nightVision = findViewById(R.id.nightVision);
+
+        popupLayout = findViewById(R.id.popupLayout);
+
+
+
+
+
+
+
 
 
         /**
@@ -140,18 +171,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
          *
          *
          AR */
-
-        nightVision = findViewById(R.id.nightVision);
-
-        arLayout = findViewById(R.id.arLayout);
-
-        arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
-
-
-
-
-
-
 
 
         //VIEW RENDERABLES
@@ -207,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
-
+        arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
         arFragment.getArSceneView().getScene().addOnUpdateListener(new Scene.OnUpdateListener() {
             @Override
             public void onUpdate(FrameTime frameTime) {
@@ -277,10 +296,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (location != null) {
 
                         origin = new LatLng(location.getLatitude(), location.getLongitude());
-
-
-
-
 
                         if (navigating)
                         {
@@ -439,6 +454,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         textUnit = findViewById(R.id.textUnit);
         textInstructions = findViewById(R.id.textInstructions);
         textNightVision = findViewById(R.id.textNightVision);
+        textCoordinates = findViewById(R.id.textCoordinates);
+        textAddress = findViewById(R.id.textAddress);
 
 
         fab = findViewById(R.id.fab);
@@ -455,8 +472,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 {
                     //start navigation
                     contractMap();
+                    popupLayout.setBackgroundColor(getResources().getColor(R.color.full_transparent, null));
+                    textCoordinates.setVisibility(View.INVISIBLE);
+                    textAddress.setVisibility(View.INVISIBLE);
+                    fabCancel.setVisibility(View.INVISIBLE);
+                    fabTravelMode.setVisibility(View.VISIBLE);
                     fab.setImageResource(R.drawable.round_close_white_36);
-                    requestDirections(origin, destination);
+                    searchView.setVisibility(View.INVISIBLE);
+                    requestDirections(origin, destination, travelMode);
                     getDeviceLocation();
                     navigating = true;
                 }
@@ -481,14 +504,62 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 {
                     //start navigation
                     Place p = new Place();
-                    destination = p.getPlace();
+                    destination = Place.getPlace();
 
                     contractMap();
+                    popupLayout.setBackgroundColor(getResources().getColor(R.color.full_transparent, null));
+                    textCoordinates.setVisibility(View.INVISIBLE);
+                    textAddress.setVisibility(View.INVISIBLE);
+                    fabCancel.setVisibility(View.INVISIBLE);
+                    fabTravelMode.setVisibility(View.VISIBLE);
                     fab2.setImageResource(R.drawable.round_close_white_36);
-                    requestDirections(origin, destination);
+                    searchView.setVisibility(View.INVISIBLE);
+                    requestDirections(origin, destination, travelMode);
                     getDeviceLocation();
                     navigating = true;
                 }
+            }
+        });
+
+
+
+
+
+        fabCancel = findViewById(R.id.fabCancel);
+        fabCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupLayout.setVisibility(View.INVISIBLE);
+                fab.setVisibility(View.INVISIBLE);
+                fab2.setVisibility(View.INVISIBLE);
+                mMap.clear();
+            }
+        });
+
+
+
+
+
+        fabTravelMode = findViewById(R.id.fabTravelMode);
+        fabTravelMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMap.clear();
+                marker = mMap.addMarker(new MarkerOptions().position(destination));
+
+                if (travelMode.equals("driving"))
+                {
+                    travelMode = "walking";
+                    fabTravelMode.setImageResource(R.drawable.round_directions_walk_black_36);
+                }
+                else
+                {
+                    travelMode = "driving";
+                    fabTravelMode.setImageResource(R.drawable.round_directions_car_black_36);
+                }
+
+
+                requestDirections(origin, destination, travelMode);
             }
         });
 
@@ -522,6 +593,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 checkGpsPermission();
                 getGpsPermission();
                 enableMyLocation();
+            }
+        });
+
+
+
+
+
+        buttonMapLayer = findViewById(R.id.buttonMapLayer);
+        buttonMapLayer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!hybridMap)
+                {
+                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                    hybridMap = true;
+                }
+                else
+                {
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                    hybridMap = false;
+                }
             }
         });
 
@@ -580,11 +672,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 {
                     requestPlace(query);
 
-                    mMap.clear();
-                    navigating = false;
-                    fab.setVisibility(View.INVISIBLE);
-                    fab.setImageResource(R.drawable.round_navigation_white_36);
-                    fab2.setImageResource(R.drawable.round_navigation_white_36);
+                        mMap.clear();
+                        navigating = false;
+                        fab.setVisibility(View.INVISIBLE);
+                        fab.setImageResource(R.drawable.round_navigation_white_36);
+                        fab2.setImageResource(R.drawable.round_navigation_white_36);
+
+
                 }
                 searchView.setIconified(true);
                 searchView.clearFocus();
@@ -713,6 +807,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.getUiSettings().setCompassEnabled(false);
+        mMap.setBuildingsEnabled(true);
 
         checkGpsPermission();
         enableMyLocation();
@@ -730,6 +825,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     fab2.setVisibility(View.INVISIBLE);
                     fab2.setImageResource(R.drawable.round_navigation_white_36);
                     fab.setVisibility(View.VISIBLE);
+
+                    try {
+                        String address = getAddress(point.latitude, point.longitude);
+                        textAddress.setText(address.substring(0, 21)+"...");
+                        textCoordinates.setText(df6.format(point.latitude)+" , "+df6.format(point.longitude));
+                    } catch (Exception e){}
+
+                    popupLayout.setVisibility(View.VISIBLE);
+                    fabCancel.setVisibility(View.VISIBLE);
+                    textCoordinates.setVisibility(View.VISIBLE);
+                    textAddress.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -738,12 +844,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                if (!navigating)
-                {
-                    fab.setVisibility(View.INVISIBLE);
-                    fab2.setVisibility(View.INVISIBLE);
-                    marker.remove();
-                }
+
                 return false;
             }
         });
@@ -892,14 +993,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         buttonExpand.setImageResource(R.drawable.round_expand_less_black_24);
     }
 
-    public void requestDirections(LatLng origin, LatLng destination)
+    public void requestDirections(LatLng origin, LatLng destination, String travelMode)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("https://maps.googleapis.com/maps/api/directions/json?");
         sb.append("origin="+origin.latitude+","+origin.longitude);
         sb.append("&destination="+destination.latitude+","+destination.longitude);
         sb.append("&departure_time=now");
-        sb.append("&mode=driving");
+        sb.append("&mode="+travelMode);
         sb.append("&key="+getString(R.string.google_maps_key)); //AIzaSyBo6CVkO8YOfq3eqRgaLSrQ5PEARPKBtyA
 
         Object[] dataTransfer = new Object[2];
@@ -919,10 +1020,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         sb.append("address="+location);
         sb.append("&key="+getString(R.string.google_maps_key)); //AIzaSyBo6CVkO8YOfq3eqRgaLSrQ5PEARPKBtyA
 
-        Object[] dataTransfer = new Object[3];
+        Object[] dataTransfer = new Object[7];
         dataTransfer[0] = mMap;
         dataTransfer[1] = sb.toString();
         dataTransfer[2] = fab2;
+        dataTransfer[3] = popupLayout;
+        dataTransfer[4] = fabCancel;
+        dataTransfer[5] = textCoordinates;
+        dataTransfer[6] = textAddress;
 
 
         GetPlaceData getPlaceData = new GetPlaceData(getApplicationContext());
@@ -934,20 +1039,47 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     {
 
         navigating = false;
+        mMap.clear();
+
+        popupLayout.setVisibility(View.INVISIBLE);
+        popupLayout.setBackgroundColor(getResources().getColor(R.color.colorBlack, null));
+        fabTravelMode.setVisibility(View.INVISIBLE);
+
         fab.setImageResource(R.drawable.round_navigation_white_36);
         fab2.setImageResource(R.drawable.round_navigation_white_36);
         fab.setVisibility(View.INVISIBLE);
         fab2.setVisibility(View.INVISIBLE);
+        searchView.setVisibility(View.VISIBLE);
         textInstructions.setText("");
         textSpeed.setText("");
         textUnit.setText("");
-        mMap.clear();
         destination = null;
         getDeviceLocation();
         removeRenderable();
 
     }
 
+    public String getAddress(double lat, double lng) {
+
+        String addStr = "";
+
+        Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+        try {
+            List<Address> addressList = geocoder.getFromLocation(lat, lng, 1);
+            Address address = addressList.get(0);
+            addStr += address.getAddressLine(0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return addStr;
+    }
+
+    public static String getTravelMode()
+    {
+        return travelMode;
+    }
 
     public static boolean getNavigating()
     {

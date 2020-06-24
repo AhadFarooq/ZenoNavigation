@@ -5,6 +5,7 @@
     <color name="colorAccent">#e254ff</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorBlack">#000000</color>
+    <color name="colorRed">#ff0000</color>
     <color name="tfe_semi_transparent">#66000000</color>
     <color name="full_transparent">#00000000</color>
     <color name="nightVision_transparent">#6666BF2F</color>

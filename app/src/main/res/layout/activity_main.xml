@@ -141,7 +141,7 @@
                         android:shadowDx="2"
                         android:shadowDy="-2"
                         android:shadowRadius="2"
-                        android:text="Night Vision"
+                        android:text=" Night Vision "
                         android:textColor="#ffffff"
                         android:textSize="10sp" />
 
@@ -181,32 +181,125 @@
                 android:padding="10dp"
                 app:srcCompat="@drawable/round_expand_less_black_24" />
 
-            <ImageButton
-                android:id="@+id/buttonMyLocation"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end|top"
-                android:background="#0000"
-                android:padding="10dp"
-                app:srcCompat="@drawable/round_my_location_black_24" />
+                android:orientation="vertical"
+                android:layout_gravity="end|top">
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|bottom"
-                android:layout_margin="18dp"
-                android:src="@drawable/round_navigation_white_36"
-                android:visibility="invisible" />
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/buttonMyLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="10dp"
+                    app:fabSize="mini"
+                    app:backgroundTint="@color/colorWhite"
+                    android:src="@drawable/round_my_location_black_36"
+                    android:visibility="visible" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab2"
-                android:layout_width="wrap_content"
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/buttonMapLayer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="10dp"
+                    app:fabSize="mini"
+                    app:backgroundTint="@color/colorWhite"
+                    android:src="@drawable/round_layers_black_36"
+                    android:visibility="visible" />
+
+            </LinearLayout>
+
+
+
+            <FrameLayout
+                android:id="@+id/popupLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end|bottom"
-                android:layout_margin="18dp"
-                android:src="@drawable/round_navigation_white_36"
-                android:visibility="invisible" />
+                android:layout_gravity="bottom"
+                android:background="@drawable/round_corners"
+                android:visibility="invisible">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="end|bottom">
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/fabCancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="10dp"
+                        app:backgroundTint="@color/colorWhite"
+                        android:src="@drawable/round_close_black_36"
+                        android:visibility="visible" />
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/fab"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end|bottom"
+                            android:layout_margin="10dp"
+                            android:src="@drawable/round_navigation_white_36"
+                            android:visibility="invisible" />
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/fab2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_margin="10dp"
+                        android:src="@drawable/round_navigation_white_36"
+                        android:visibility="invisible" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabTravelMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|bottom"
+                    android:layout_margin="10dp"
+                    app:backgroundTint="@color/colorWhite"
+                    android:src="@drawable/round_directions_car_black_36"
+                    android:visibility="invisible" />
+
+                <TextView
+                    android:id="@+id/textCoordinates"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|top"
+                    android:padding="10dp"
+                    android:text="Coordinates"
+                    android:textColor="@color/colorRed"
+                    android:textSize="18sp"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:id="@+id/textAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|bottom"
+                    android:padding="10dp"
+                    android:text="Address"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="18sp"
+                    android:singleLine="true" />
+
+            </FrameLayout>
+
+
+
 
         </FrameLayout>
 

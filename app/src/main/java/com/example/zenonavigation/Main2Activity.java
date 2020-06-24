@@ -66,6 +66,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.maps.android.SphericalUtil;
 
 import java.io.IOException;
@@ -89,6 +90,7 @@ public class Main2Activity extends AppCompatActivity implements
   private boolean nightVisionOn = false;
   private boolean gps_enabled = false;
   private boolean network_enabled = false;
+  private String travelMode;
 
   private static final Logger LOGGER = new Logger();
 
@@ -157,7 +159,7 @@ public class Main2Activity extends AppCompatActivity implements
 
   private CameraPosition currentMapPos;
 
-  private ImageButton buttonMyLocation;
+  private FloatingActionButton buttonMyLocation;
 
   private ImageButton buttonDetect;
   private ImageButton buttonNightVision;
@@ -360,6 +362,7 @@ public class Main2Activity extends AppCompatActivity implements
     mMap.getUiSettings().setMyLocationButtonEnabled(false);
     mMap.getUiSettings().setMapToolbarEnabled(false);
     mMap.getUiSettings().setCompassEnabled(false);
+    mMap.setBuildingsEnabled(true);
 
     checkGpsPermission();
 
@@ -378,14 +381,20 @@ public class Main2Activity extends AppCompatActivity implements
     navigating = MainActivity.getNavigating();
     origin = MainActivity.getOrigin();
     destination = MainActivity.getDestination();
+    travelMode = MainActivity.getTravelMode();
     if (navigating && origin!=null && destination!=null)
     {
-      requestDirections(origin, destination);
+      requestDirections(origin, destination, travelMode);
       mMap.addMarker(new MarkerOptions().position(destination));
     }
 
 
-
+    mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+      @Override
+      public void onMapClick(LatLng latLng) {
+        finish();
+      }
+    });
 
   }
 
@@ -462,12 +471,14 @@ public class Main2Activity extends AppCompatActivity implements
     }
   }
 
-  public void requestDirections(LatLng origin, LatLng destination)
+  public void requestDirections(LatLng origin, LatLng destination, String travelMode)
   {
     StringBuilder sb = new StringBuilder();
     sb.append("https://maps.googleapis.com/maps/api/directions/json?");
     sb.append("origin="+origin.latitude+","+origin.longitude);
     sb.append("&destination="+destination.latitude+","+destination.longitude);
+    sb.append("&departure_time=now");
+    sb.append("&mode="+travelMode);
     sb.append("&key="+getString(R.string.google_maps_key)); //AIzaSyBo6CVkO8YOfq3eqRgaLSrQ5PEARPKBtyA
 
     Object[] dataTransfer = new Object[2];

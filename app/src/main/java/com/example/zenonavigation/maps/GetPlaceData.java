@@ -1,8 +1,12 @@
 package com.example.zenonavigation.maps;
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,12 +26,22 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Locale;
 
 public class GetPlaceData extends AsyncTask<Object, String ,String> {
+
+
+    private static DecimalFormat df6 = new DecimalFormat("#.######");
 
     GoogleMap mMap;
     String url;
     FloatingActionButton fab2;
+    FrameLayout popupLayout;
+    FloatingActionButton fabCancel;
+    TextView textCoordinates;
+    TextView textAddress;
 
     double lat;
     double lng;
@@ -50,6 +64,10 @@ public class GetPlaceData extends AsyncTask<Object, String ,String> {
         mMap = (GoogleMap) params[0];
         url = (String) params[1];
         fab2 = (FloatingActionButton) params[2];
+        popupLayout = (FrameLayout) params[3];
+        fabCancel = (FloatingActionButton) params[4];
+        textCoordinates = (TextView) params[5];
+        textAddress = (TextView) params[6];
 
         try {
             URL myUrl = new URL(url);
@@ -78,8 +96,6 @@ public class GetPlaceData extends AsyncTask<Object, String ,String> {
     @Override
     protected void onPostExecute(String s) {
 
-        Place p = new Place();
-
         try {
             JSONObject jsonObject = new JSONObject(s);
 
@@ -96,17 +112,27 @@ public class GetPlaceData extends AsyncTask<Object, String ,String> {
 
                 location = new LatLng(lat, lng);
 
-                p.setPlace(location);
+                Place.setPlace(location);
 
                 mMap.addMarker(new MarkerOptions().position(location));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 17));
 
+                try {
+                    String address = getAddress(location.latitude, location.longitude);
+                    textAddress.setText(address.substring(0, 21)+"...");
+                    textCoordinates.setText(df6.format(location.latitude)+" , "+df6.format(location.longitude));
+                } catch (Exception e){}
+
                 fab2.setVisibility(View.VISIBLE);
+                popupLayout.setVisibility(View.VISIBLE);
+                fabCancel.setVisibility(View.VISIBLE);
+                textCoordinates.setVisibility(View.VISIBLE);
+                textAddress.setVisibility(View.VISIBLE);
 
             }
             else
             {
-                p.setPlace(null);
+                Place.setPlace(null);
                 fab2.setVisibility(View.INVISIBLE);
                 Toast.makeText(c, "No Result", Toast.LENGTH_SHORT).show();
             }
@@ -114,6 +140,23 @@ public class GetPlaceData extends AsyncTask<Object, String ,String> {
         catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getAddress(double lat, double lng) {
+
+        String addStr = "";
+
+        Geocoder geocoder = new Geocoder(c, Locale.getDefault());
+        try {
+            List<Address> addressList = geocoder.getFromLocation(lat, lng, 1);
+            Address address = addressList.get(0);
+            addStr += address.getAddressLine(0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return addStr;
     }
 
 }
