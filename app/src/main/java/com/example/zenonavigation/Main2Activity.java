@@ -91,6 +91,7 @@ public class Main2Activity extends AppCompatActivity implements
   private boolean gps_enabled = false;
   private boolean network_enabled = false;
   private String travelMode;
+  private boolean hybridMap;
 
   private static final Logger LOGGER = new Logger();
 
@@ -382,6 +383,17 @@ public class Main2Activity extends AppCompatActivity implements
     origin = MainActivity.getOrigin();
     destination = MainActivity.getDestination();
     travelMode = MainActivity.getTravelMode();
+    hybridMap = MainActivity.gethybridMap();
+
+      if (hybridMap)
+      {
+          mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+      }
+      else
+      {
+          mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+      }
+
     if (navigating && origin!=null && destination!=null)
     {
       requestDirections(origin, destination, travelMode);
@@ -490,6 +502,34 @@ public class Main2Activity extends AppCompatActivity implements
 
 
   }
+
+    public void fullScreen()
+    {
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                    decorView.setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    );
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus) {
+            fullScreen();
+        }
+    }
 
 
 
@@ -654,28 +694,11 @@ public class Main2Activity extends AppCompatActivity implements
     LOGGER.d("onResume " + this);
     super.onResume();
 
+    fullScreen();
+
     handlerThread = new HandlerThread("inference");
     handlerThread.start();
     handler = new Handler(handlerThread.getLooper());
-
-
-    final View decorView = getWindow().getDecorView();
-    decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {
-      @Override
-      public void onSystemUiVisibilityChange(int visibility) {
-        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-          decorView.setSystemUiVisibility(
-                  View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                          | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                          | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                          | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                          | View.SYSTEM_UI_FLAG_FULLSCREEN
-                          | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-          );
-        }
-      }
-    });
-
 
   }
 

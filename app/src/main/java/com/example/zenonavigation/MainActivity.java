@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static boolean navigating = false;
     private boolean expanded = false;
     private boolean nightVisionOn = false;
-    private boolean hybridMap = false;
+    private static boolean hybridMap = false;
 
     private FrameLayout arLayout;
     private ArFragment arFragment;
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng[] target_location;
     private double[] distance;
 
-    private int i=0;
+    private int i = 0;
 
 
     private LocationRequest locationRequest;
@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
 
         /**
@@ -157,13 +156,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         nightVision = findViewById(R.id.nightVision);
 
         popupLayout = findViewById(R.id.popupLayout);
-
-
-
-
-
-
-
 
 
         /**
@@ -219,13 +211,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .thenAccept(viewRenderable -> uturn_right = viewRenderable);
 
 
-
-
-
-
-
-
-
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
         arFragment.getArSceneView().getScene().addOnUpdateListener(new Scene.OnUpdateListener() {
             @Override
@@ -235,10 +220,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Camera camera = frame.getCamera();
                 cameraPose = camera.getDisplayOrientedPose().compose(Pose.makeTranslation(0, -1, -5f));
 
-                try
-                {
-                    if (anchorNode != null)
-                    {
+                try {
+                    if (anchorNode != null) {
                         objectPose = anchor.getPose();
                         currentCameraPose = camera.getDisplayOrientedPose();
 
@@ -248,24 +231,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         float distanceMeters = (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
                     }
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
 
-
             }
         });
-
-
-
-
-
-
-
-
-
 
 
         /**
@@ -286,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         locationRequest.setFastestInterval(0);
         locationRequest.setSmallestDisplacement(0);
 
-        locationCallback = new LocationCallback(){
+        locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null) {
@@ -297,8 +269,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         origin = new LatLng(location.getLatitude(), location.getLongitude());
 
-                        if (navigating)
-                        {
+                        if (navigating) {
 
                             float speed = location.getSpeed();
                             textSpeed.setText(df2.format(speed));
@@ -314,106 +285,74 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(newPos));
 
 
-
-
-
-
-
-
-
                             maneuver = Directions.getManeuver();
                             instructions = Directions.getInstructions();
                             target_location = Directions.getStartLocation();
 
 
-
-                            if (target_location!=null)
-                            {
+                            if (target_location != null) {
 
 
                                 distance = new double[target_location.length];
 
 
-                                for (int i=0; i<target_location.length; i++)
-                                {
-
+                                for (int i = 0; i < target_location.length; i++) {
 
 
                                     double totalDistance = SphericalUtil.computeDistanceBetween(origin, destination);
-                                    if (totalDistance < 5)
-                                    {
+                                    if (totalDistance < 5) {
                                         stopNavigation();
                                         break;
                                     }
 
 
-
                                     distance[i] = SphericalUtil.computeDistanceBetween(origin, target_location[i]);
 
-                                    if (distance[i] <= 10)
-                                    {
+                                    if (distance[i] <= 10) {
 
-                                        if (maneuver[i]==null) {
+                                        if (maneuver[i] == null) {
                                             removeRenderable();
                                             addRenderable(straight);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
                                             break;
-                                        }
-
-                                        else if (maneuver[i].equals("turn-slight-left")) {
+                                        } else if (maneuver[i].equals("turn-slight-left")) {
                                             removeRenderable();
                                             addRenderable(slight_left);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
                                             break;
-                                        }
-
-                                        else if (maneuver[i].equals("uturn-left")) {
+                                        } else if (maneuver[i].equals("uturn-left")) {
                                             removeRenderable();
                                             addRenderable(uturn_left);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
                                             break;
-                                        }
-
-                                        else if (maneuver[i].equals("turn-left")) {
+                                        } else if (maneuver[i].equals("turn-left")) {
                                             removeRenderable();
                                             addRenderable(left);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
                                             break;
-                                        }
-
-                                        else if (maneuver[i].equals("turn-slight-right")) {
+                                        } else if (maneuver[i].equals("turn-slight-right")) {
                                             removeRenderable();
                                             addRenderable(slight_right);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
                                             break;
-                                        }
-
-                                        else if (maneuver[i].equals("uturn-right")) {
+                                        } else if (maneuver[i].equals("uturn-right")) {
                                             removeRenderable();
                                             addRenderable(uturn_right);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
                                             break;
-                                        }
-
-                                        else if (maneuver[i].equals("turn-right")) {
+                                        } else if (maneuver[i].equals("turn-right")) {
                                             removeRenderable();
                                             addRenderable(right);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
                                             break;
-                                        }
-
-                                        else if (maneuver[i].equals("straight")) {
+                                        } else if (maneuver[i].equals("straight")) {
                                             removeRenderable();
                                             addRenderable(straight);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
                                             break;
                                         }
 
-                                    }
-
-
-                                    else
-                                    {
+                                    } else {
 
                                         removeRenderable();
                                         addRenderable(straight);
@@ -431,16 +370,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         };
 
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-
-
-
-
-
-
-
-
-
-
 
 
         /**
@@ -462,14 +391,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (navigating)
-                {
+                if (navigating) {
                     //end navigation
                     stopNavigation();
 
-                }
-                else
-                {
+                } else {
                     //start navigation
                     contractMap();
                     popupLayout.setBackgroundColor(getResources().getColor(R.color.full_transparent, null));
@@ -487,21 +413,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-
-
-
         fab2 = findViewById(R.id.fab2);
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (navigating)
-                {
+                if (navigating) {
                     //end navigation
                     stopNavigation();
 
-                }
-                else
-                {
+                } else {
                     //start navigation
                     Place p = new Place();
                     destination = Place.getPlace();
@@ -522,9 +442,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-
-
-
         fabCancel = findViewById(R.id.fabCancel);
         fabCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -537,9 +454,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-
-
-
         fabTravelMode = findViewById(R.id.fabTravelMode);
         fabTravelMode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -547,13 +461,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mMap.clear();
                 marker = mMap.addMarker(new MarkerOptions().position(destination));
 
-                if (travelMode.equals("driving"))
-                {
+                if (travelMode.equals("driving")) {
                     travelMode = "walking";
                     fabTravelMode.setImageResource(R.drawable.round_directions_walk_black_36);
-                }
-                else
-                {
+                } else {
                     travelMode = "driving";
                     fabTravelMode.setImageResource(R.drawable.round_directions_car_black_36);
                 }
@@ -564,26 +475,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-
-
-
         buttonExpand = findViewById(R.id.buttonExpand);
         buttonExpand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (expanded)
-                {
+                if (expanded) {
                     contractMap();
-                }
-                else
-                {
+                } else {
                     expandMap();
                 }
             }
         });
-
-
-
 
 
         buttonMyLocation = findViewById(R.id.buttonMyLocation);
@@ -597,20 +499,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-
-
-
         buttonMapLayer = findViewById(R.id.buttonMapLayer);
         buttonMapLayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!hybridMap)
-                {
+                if (!hybridMap) {
                     mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                     hybridMap = true;
-                }
-                else
-                {
+                } else {
                     mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                     hybridMap = false;
                 }
@@ -618,15 +514,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-
-
-
         buttonDetect = findViewById(R.id.buttonDetect);
         buttonDetect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mLocationPermissionGranted)
-                {
+                if (mLocationPermissionGranted) {
                     Intent intent = new Intent(MainActivity.this, Main2Activity.class);
                     startActivity(intent);
                 }
@@ -634,30 +526,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-
-
-
         buttonNightVision = findViewById(R.id.buttonNightVision);
         buttonNightVision.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!nightVisionOn)
-                {
+                if (!nightVisionOn) {
                     nightVision.setBackgroundColor(getResources().getColor(R.color.nightVision_transparent, null));
                     textNightVision.setTextColor(getResources().getColor(R.color.colorAccent, null));
                     nightVisionOn = true;
-                }
-                else
-                {
+                } else {
                     nightVision.setBackgroundColor(getResources().getColor(R.color.full_transparent, null));
                     textNightVision.setTextColor(getResources().getColor(R.color.colorWhite, null));
                     nightVisionOn = false;
                 }
             }
         });
-
-
-
 
 
         //SEARCH VIEW
@@ -668,15 +551,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public boolean onQueryTextSubmit(String query) {
                 checkGpsPermission();
-                if (mLocationPermissionGranted && (gps_enabled || network_enabled))
-                {
+                if (mLocationPermissionGranted && (gps_enabled || network_enabled)) {
                     requestPlace(query);
 
-                        mMap.clear();
-                        navigating = false;
-                        fab.setVisibility(View.INVISIBLE);
-                        fab.setImageResource(R.drawable.round_navigation_white_36);
-                        fab2.setImageResource(R.drawable.round_navigation_white_36);
+                    mMap.clear();
+                    navigating = false;
+                    fab.setVisibility(View.INVISIBLE);
+                    fab.setImageResource(R.drawable.round_navigation_white_36);
+                    fab2.setImageResource(R.drawable.round_navigation_white_36);
 
 
                 }
@@ -714,23 +596,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-
-
-
     }
 
-
-
-
-
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus) {
+            fullScreen();
+        }
+    }
 
     @Override
     public void onResume() {
         super.onResume();
 
+        fullScreen();
 
+        arFragment.getPlaneDiscoveryController().hide();
+        arFragment.getPlaneDiscoveryController().setInstructionView(null);
+        arFragment.getArSceneView().getPlaneRenderer().setEnabled(false);
+
+    }
+
+    public void fullScreen()
+    {
         final View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {
+        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
             @Override
             public void onSystemUiVisibilityChange(int visibility) {
                 if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
@@ -745,11 +636,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
-
-        arFragment.getPlaneDiscoveryController().hide();
-        arFragment.getPlaneDiscoveryController().setInstructionView(null);
-        arFragment.getArSceneView().getPlaneRenderer().setEnabled(false);
-
     }
 
 
@@ -1079,6 +965,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static String getTravelMode()
     {
         return travelMode;
+    }
+
+    public static boolean gethybridMap()
+    {
+        return hybridMap;
     }
 
     public static boolean getNavigating()
