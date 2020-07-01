@@ -887,7 +887,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         sb.append("&destination="+destination.latitude+","+destination.longitude);
         sb.append("&departure_time=now");
         sb.append("&mode="+travelMode);
-        sb.append("&key="+getString(R.string.google_maps_key)); //AIzaSyBo6CVkO8YOfq3eqRgaLSrQ5PEARPKBtyA
+        sb.append("&key="+getString(R.string.google_maps_key));
 
         Object[] dataTransfer = new Object[2];
         dataTransfer[0] = mMap;
@@ -904,7 +904,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         StringBuilder sb = new StringBuilder();
         sb.append("https://maps.google.com/maps/api/geocode/json?");
         sb.append("address="+location);
-        sb.append("&key="+getString(R.string.google_maps_key)); //AIzaSyBo6CVkO8YOfq3eqRgaLSrQ5PEARPKBtyA
+        sb.append("&key="+getString(R.string.google_maps_key));
 
         Object[] dataTransfer = new Object[7];
         dataTransfer[0] = mMap;
