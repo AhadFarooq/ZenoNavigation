@@ -13,6 +13,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -126,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ViewRenderable uturn_left;
     private ViewRenderable uturn_right;
 
+    private TextToSpeech tts;
+    private static String voiceInstruction;
+
     private String[] maneuver;
     private String[] instructions;
     private LatLng[] target_location;
@@ -156,6 +160,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         nightVision = findViewById(R.id.nightVision);
 
         popupLayout = findViewById(R.id.popupLayout);
+
+
+
+
+
+        /**
+        *
+        *
+        *
+         TextToSpeech */
+
+        tts = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    tts.setLanguage(Locale.US);
+                }
+            }
+        });
+
 
 
         /**
@@ -301,6 +325,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                                     double totalDistance = SphericalUtil.computeDistanceBetween(origin, destination);
                                     if (totalDistance < 5) {
+                                        speak("you have reached your destination");
                                         stopNavigation();
                                         break;
                                     }
@@ -308,47 +333,55 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                                     distance[i] = SphericalUtil.computeDistanceBetween(origin, target_location[i]);
 
-                                    if (distance[i] <= 10) {
+                                    if (distance[i] <= 5) {
 
                                         if (maneuver[i] == null) {
                                             removeRenderable();
                                             addRenderable(straight);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
+                                            speak(textInstructions.getText().toString());
                                             break;
                                         } else if (maneuver[i].equals("turn-slight-left")) {
                                             removeRenderable();
                                             addRenderable(slight_left);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
+                                            speak(textInstructions.getText().toString());
                                             break;
                                         } else if (maneuver[i].equals("uturn-left")) {
                                             removeRenderable();
                                             addRenderable(uturn_left);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
+                                            speak(textInstructions.getText().toString());
                                             break;
                                         } else if (maneuver[i].equals("turn-left")) {
                                             removeRenderable();
                                             addRenderable(left);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
+                                            speak(textInstructions.getText().toString());
                                             break;
                                         } else if (maneuver[i].equals("turn-slight-right")) {
                                             removeRenderable();
                                             addRenderable(slight_right);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
+                                            speak(textInstructions.getText().toString());
                                             break;
                                         } else if (maneuver[i].equals("uturn-right")) {
                                             removeRenderable();
                                             addRenderable(uturn_right);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
+                                            speak(textInstructions.getText().toString());
                                             break;
                                         } else if (maneuver[i].equals("turn-right")) {
                                             removeRenderable();
                                             addRenderable(right);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
+                                            speak(textInstructions.getText().toString());
                                             break;
                                         } else if (maneuver[i].equals("straight")) {
                                             removeRenderable();
                                             addRenderable(straight);
                                             textInstructions.setText(Html.fromHtml(instructions[i], Html.FROM_HTML_MODE_COMPACT));
+                                            speak(textInstructions.getText().toString());
                                             break;
                                         }
 
@@ -408,6 +441,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     requestDirections(origin, destination, travelMode);
                     getDeviceLocation();
                     navigating = true;
+                    speak("navigation started");
                 }
             }
         });
@@ -437,6 +471,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     requestDirections(origin, destination, travelMode);
                     getDeviceLocation();
                     navigating = true;
+                    speak("navigation started");
                 }
             }
         });
@@ -677,6 +712,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+
+
+    public void speak(String text)
+    {
+        if (!text.equals(voiceInstruction))
+        {
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        }
+        voiceInstruction = text;
+    }
 
 
 
@@ -942,6 +987,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         destination = null;
         getDeviceLocation();
         removeRenderable();
+
+        voiceInstruction = null;
 
     }
 
